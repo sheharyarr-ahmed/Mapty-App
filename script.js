@@ -11,15 +11,44 @@ const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 
-// experimenting with the geo-location API
+// experimenting with the geo-location API and adding the map via leaflet library
 navigator.geolocation.getCurrentPosition(
   //this api accepts two call back functionsone when successfully find the geo locationand the other if it fails to find the geo location
   function (position) {
+    // console.log(hey); //was experimenting added an anohter file in the html index and was experimenting on how to connect more than one scripts.
     const { latitude } = position.coords;
     const { longitude } = position.coords;
     console.log(
       `https://www.google.com/maps/@${latitude},${longitude},16z?entry=ttu&g_ep=EgoyMDI1MDgyNC4wIKXMDSoASAFQAw%3D%3D`
     );
+
+    const coords = [latitude, longitude];
+
+    const map = L.map('map').setView(coords, 13);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map);
+    //adding the putting the marker on click on map, here map.on is acting an event-listener provided by the library itself, read docs for more
+    map.on('click', function (mapEvent) {
+      console.log(mapEvent);
+      const { lat, lng } = mapEvent.latlng;
+      //all of the chained mehthods below are the properties of api, see the docs
+      L.marker([lat, lng])
+        .addTo(map)
+        .bindPopup(
+          L.popup({
+            maxWidth: 250,
+            minWidth: 100,
+            autoClose: false,
+            closeOnClick: false,
+            className: 'running-popup',
+          })
+        )
+        .setPopupContent('Workout')
+        .openPopup();
+    });
   },
   function () {
     alert('Could not get your position!');
